@@ -3,6 +3,7 @@
 #include <memory>
 #include <numeric>
 #include <vector>
+#include <functional>
 
 namespace engine {
 namespace tensor {
