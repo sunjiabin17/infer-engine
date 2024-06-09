@@ -1,25 +1,26 @@
 #pragma once
-#include <vector>
+#include <initializer_list>
 #include <memory>
 #include <numeric>
-#include <initializer_list>
-
+#include <vector>
 
 namespace engine {
 namespace tensor {
 template <typename T>
 class Tensor {
-private:
-  explicit Tensor(const std::vector<int64_t>& shape, const std::shared_ptr<T>& data);
+ private:
+  explicit Tensor(const std::vector<int64_t>& shape,
+                  const std::shared_ptr<T>& data);
 
-public:
+ public:
   explicit Tensor();
 
   explicit Tensor(const std::vector<int64_t>& shape);
 
   explicit Tensor(const std::vector<int64_t>& shape, const T* data);
 
-  explicit Tensor(const std::vector<int64_t>& shape, const std::vector<T>& data);
+  explicit Tensor(const std::vector<int64_t>& shape,
+                  const std::vector<T>& data);
 
   Tensor(const Tensor& other);
 
@@ -59,8 +60,6 @@ public:
 
   Tensor reshape(const std::vector<int64_t>& shape) const;
 
-  Tensor transpose() const;
-
   Tensor transpose(const std::vector<int64_t>& axes) const;
 
   Tensor squeeze() const;
@@ -87,15 +86,12 @@ public:
 
   void transform(Tensor& other, const std::function<T(T)>& f) const;
 
-private:
+ private:
   size_t size_;
   std::shared_ptr<T> data_;
   std::vector<int64_t> shape_;
   std::vector<int64_t> strides_;
-
 };
 
-
-} // namespace tensor
-} // namespace engine
-
+}  // namespace tensor
+}  // namespace engine

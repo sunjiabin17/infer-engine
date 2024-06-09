@@ -1,13 +1,13 @@
-#include <gtest/gtest.h>
 #include <glog/logging.h>
-#include <vector>
-#include <string>
+#include <gtest/gtest.h>
+
 #include <memory>
-#include <ostream>
 #include <numeric>
+#include <ostream>
+#include <string>
+#include <vector>
 
 #include "data/tensor.h"
-
 
 TEST(TENSOR, TENSOR_CONSTRUCTOR1) {
   engine::tensor::Tensor<float> tensor;
@@ -90,11 +90,15 @@ TEST(TENSOR, TENSOR_COPY_CONSTRUCTOR2) {
 
 TEST(TENSOR, TENSOR_MOVE_CONSTRUCTOR1) {
   engine::tensor::Tensor<float> tensor1({1, 2, 3});
-  std::string address1 = reinterpret_cast<std::ostringstream&>(std::ostringstream() << tensor1.data()).str();
+  std::string address1 = reinterpret_cast<std::ostringstream &>(
+                             std::ostringstream() << tensor1.data())
+                             .str();
 
   engine::tensor::Tensor<float> tensor2(std::move(tensor1));
-  std::string address2 = reinterpret_cast<std::ostringstream&>(std::ostringstream() << tensor2.data()).str();
-  
+  std::string address2 = reinterpret_cast<std::ostringstream &>(
+                             std::ostringstream() << tensor2.data())
+                             .str();
+
   EXPECT_EQ(address1, address2);
   EXPECT_EQ(tensor1.size(), 0);
   EXPECT_EQ(tensor1.shape().size(), 0);
@@ -108,11 +112,15 @@ TEST(TENSOR, TENSOR_MOVE_CONSTRUCTOR1) {
 
 TEST(TENSOR, TENSOR_MOVE_CONSTRUCTOR2) {
   engine::tensor::Tensor<float> tensor1({1, 2, 3});
-  std::string address1 = reinterpret_cast<std::ostringstream&>(std::ostringstream() << tensor1.data()).str();
+  std::string address1 = reinterpret_cast<std::ostringstream &>(
+                             std::ostringstream() << tensor1.data())
+                             .str();
 
   engine::tensor::Tensor<float> tensor2 = std::move(tensor1);
-  std::string address2 = reinterpret_cast<std::ostringstream&>(std::ostringstream() << tensor2.data()).str();
-  
+  std::string address2 = reinterpret_cast<std::ostringstream &>(
+                             std::ostringstream() << tensor2.data())
+                             .str();
+
   EXPECT_EQ(address1, address2);
   EXPECT_EQ(tensor1.size(), 0);
   EXPECT_EQ(tensor1.shape().size(), 0);

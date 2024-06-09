@@ -1,10 +1,7 @@
-#include <gtest/gtest.h>
 #include <glog/logging.h>
+#include <gtest/gtest.h>
 
-
-TEST(Test, Test1) {
-  EXPECT_EQ(1, 1);
-}
+TEST(Test, Test1) { EXPECT_EQ(1, 1); }
 
 int main(int argc, char **argv) {
   google::InitGoogleLogging(argv[0]);
