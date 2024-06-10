@@ -128,6 +128,27 @@ Tensor<T>& Tensor<T>::operator=(Tensor&& other) noexcept {
 }
 
 template <typename T>
+void Tensor<T>::print(std::ostream& os) const {
+  os << "shape: ";
+  for (auto i : shape_) {
+    os << i << " ";
+  }
+  os << std::endl;
+
+  os << "strides: ";
+  for (auto i : strides_) {
+    os << i << " ";
+  }
+  os << std::endl;
+
+  os << "data: ";
+  for (int64_t i = 0; i < size_; ++i) {
+    os << data_.get()[i] << " ";
+  }
+  os << std::endl;
+}
+
+template <typename T>
 Tensor<T>::~Tensor() {}
 
 template <typename T>
@@ -227,44 +248,76 @@ Tensor<T> Tensor<T>::reshape(const std::vector<int64_t>& shape) const {
     throw std::invalid_argument("size mismatch");
   }
 
-  Tensor<T> tensor;
-  tensor.size_ = size;
-  tensor.shape_ = shape;
-  tensor.strides_ = shape;
-  tensor.data_ = data_;
-
-  tensor.strides_[shape.size() - 1] = 1;
-  for (int64_t i = shape.size() - 2; i >= 0; --i) {
-    tensor.strides_[i] = shape[i + 1] * tensor.strides_[i + 1];
-  }
+  T* new_data = new T[size];
+  std::copy(data_.get(), data_.get() + size_, new_data);
+  Tensor<T> tensor(shape, new_data);
 
   return tensor;
 }
 
 template <typename T>
-Tensor<T> Tensor<T>::transpose(const std::vector<int64_t>& axes) const {
-  if (axes.empty()) {
-    throw std::invalid_argument("axes must not be empty");
-  }
-  if (axes.size() != shape_.size()) {
-    throw std::invalid_argument("axes size mismatch");
+Tensor<T> Tensor<T>::view(const std::vector<int64_t>& shape) const {
+  if (shape.empty()) {
+    throw std::invalid_argument("shape must not be empty");
   }
 
-  std::vector<int64_t> shape(shape_.size());
-  std::vector<int64_t> strides(strides_.size());
-  for (int64_t i = 0; i < axes.size(); ++i) {
-    shape[i] = shape_[axes[i]];
-    strides[i] = strides_[axes[i]];
+  int64_t size = std::accumulate(shape.begin(), shape.end(), 1,
+                                 std::multiplies<int64_t>());
+  if (size != size_) {
+    throw std::invalid_argument("size mismatch");
   }
 
-  Tensor<T> tensor;
-  tensor.size_ = size_;
-  tensor.shape_ = shape;
-  tensor.strides_ = strides;
-  tensor.data_ = data_;
+  Tensor<T> tensor(shape, data_);
 
   return tensor;
 }
+
+
+
+template <typename T>
+Tensor<T> Tensor<T>::transpose(int64_t axis1, int64_t axis2) const {
+  if (axis1 >= shape_.size() || axis2 >= shape_.size()) {
+    throw std::out_of_range("Dimension out of range");
+  }
+
+  std::vector<int64_t> new_shape = shape_;
+  std::swap(new_shape[axis1], new_shape[axis2]);
+
+  T* new_data = new T[size_];
+  Tensor<T> new_tensor(new_shape, new_data);
+  std::vector<int64_t> new_strides = new_tensor.strides();
+
+  auto compute_offset = [](const std::vector<int64_t>& indices,
+                           const std::vector<int64_t>& strides) -> int64_t {
+    int64_t offset = 0;
+    for (int64_t i = 0; i < indices.size(); ++i) {
+      offset += indices[i] * strides[i];
+    }
+    return offset;
+  };
+
+  std::vector<int64_t> old_indices(shape_.size(), 0);
+  std::vector<int64_t> new_indices(new_shape.size(), 0);
+  int64_t old_index = 0;
+  int64_t new_index = 0;
+  for (int64_t i = 0; i < size_; ++i) {
+    old_index = compute_offset(old_indices, strides_);
+    new_indices = old_indices;
+    std::swap(new_indices[axis1], new_indices[axis2]);
+    new_index = compute_offset(new_indices, new_strides);
+    new_tensor[new_index] = (*this)[old_index];
+    for (int64_t j = shape_.size() - 1; j >= 0; --j) {
+      if (old_indices[j] + 1 < shape_[j]) {
+        ++old_indices[j];
+        break;
+      } else {
+        old_indices[j] = 0;
+      }
+    }
+  }
+  return new_tensor;
+}
+
 
 template class Tensor<float>;
 template class Tensor<double>;

@@ -33,6 +33,8 @@ class Tensor {
 
   ~Tensor();
 
+  void print(std::ostream& os) const;
+
   T& operator[](int64_t index);
 
   const T& operator[](int64_t index) const;
@@ -61,7 +63,7 @@ class Tensor {
 
   Tensor reshape(const std::vector<int64_t>& shape) const;
 
-  Tensor transpose(const std::vector<int64_t>& axes) const;
+  Tensor transpose(int64_t axis1, int64_t axis2) const;
 
   Tensor squeeze() const;
 

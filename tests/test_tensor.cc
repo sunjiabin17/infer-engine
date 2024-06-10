@@ -132,6 +132,57 @@ TEST(TENSOR, TENSOR_MOVE_CONSTRUCTOR2) {
   EXPECT_NE(tensor2.data(), nullptr);
 }
 
+TEST(TENSOR, TENSOR_GET_DATA1) {
+  std::vector<float> data = {1, 2, 3, 4, 5, 6};
+  engine::tensor::Tensor<float> tensor({1, 2, 3}, data);
+  float a = tensor[3];
+  EXPECT_EQ(a, 4);
+}
+
+TEST(TENSOR, TENSOR_GET_DATA2) {
+  std::vector<float> data = {1, 2, 3, 4, 5, 6};
+  engine::tensor::Tensor<float> tensor({1, 2, 3}, data);
+  const float a = tensor[2];
+  EXPECT_EQ(a, 3);
+}
+
+TEST(TENSOR, TENSOR_GET_DATA3) {
+  std::vector<float> data = {1, 2, 3, 4, 5, 6};
+  engine::tensor::Tensor<float> tensor({1, 2, 3}, data);
+  float a = tensor[{0, 1, 2}];
+  EXPECT_EQ(a, 6);
+}
+
+TEST(TENSOR, TENSOR_RESHAPE) {
+  std::vector<float> data = {1, 2, 3, 4, 5, 6};
+  engine::tensor::Tensor<float> tensor({1, 2, 3}, data);
+  tensor.print(std::cout);
+  engine::tensor::Tensor<float> tensor_reshaped = tensor.reshape({2, 3, 1});
+  tensor_reshaped.print(std::cout);
+  float a = tensor_reshaped[{1, 2, 0}];
+  EXPECT_EQ(a, 6);
+}
+
+TEST(TENSOR, TENSOR_VIEW) {
+  std::vector<float> data = {1, 2, 3, 4, 5, 6};
+  engine::tensor::Tensor<float> tensor({1, 2, 3}, data);
+  tensor.print(std::cout);
+  engine::tensor::Tensor<float> tensor_viewd = tensor.view({2, 3});
+  tensor_viewd.print(std::cout);
+  float a = tensor_viewd[{1, 1}];
+  EXPECT_EQ(a, 5);
+}
+
+TEST(TENSOR, TENSOR_TRANSPOSE) {
+  std::vector<float> data = {1, 2, 3, 4, 5, 6};
+  engine::tensor::Tensor<float> tensor({1, 2, 3}, data);
+  tensor.print(std::cout);
+  engine::tensor::Tensor<float> tensor_transposed = tensor.transpose(0, 1);
+  tensor_transposed.print(std::cout);
+  float a = tensor_transposed[{1, 0, 1}];
+  EXPECT_EQ(a, 5);
+}
+
 int main(int argc, char **argv) {
   google::InitGoogleLogging(argv[0]);
   FLAGS_logtostderr = 1;
