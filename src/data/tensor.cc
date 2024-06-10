@@ -272,8 +272,6 @@ Tensor<T> Tensor<T>::view(const std::vector<int64_t>& shape) const {
   return tensor;
 }
 
-
-
 template <typename T>
 Tensor<T> Tensor<T>::transpose(int64_t axis1, int64_t axis2) const {
   if (axis1 >= shape_.size() || axis2 >= shape_.size()) {
@@ -318,6 +316,13 @@ Tensor<T> Tensor<T>::transpose(int64_t axis1, int64_t axis2) const {
   return new_tensor;
 }
 
+template <typename T>
+Tensor<T> Tensor<T>::clone() const {
+  T* new_data = new T[size_];
+  std::copy(data_.get(), data_.get() + size_, new_data);
+  Tensor<T> tensor(shape_, new_data);
+  return tensor;
+}
 
 template class Tensor<float>;
 template class Tensor<double>;

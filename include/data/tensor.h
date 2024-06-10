@@ -1,9 +1,9 @@
 #pragma once
+#include <functional>
 #include <initializer_list>
 #include <memory>
 #include <numeric>
 #include <vector>
-#include <functional>
 
 namespace engine {
 namespace tensor {
